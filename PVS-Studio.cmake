@@ -1,8 +1,13 @@
-# 2006-2008 (c) Viva64.com Team
-# 2008-2018 (c) OOO "Program Verification Systems"
-#
-# Version 12
-
+##############################################################
+###
+###   File name: PVS-Studio.cmake
+###
+###   Description: Enable PVS-Studio for code analysis
+###
+###   Developed: R Sedani
+###   Last modified: Nov, 2021
+###
+##############################################################
 cmake_minimum_required(VERSION 2.8.12)
 cmake_policy(SET CMP0054 NEW)
 
@@ -37,16 +42,10 @@ if (PVS_STUDIO_AS_SCRIPT)
                     OUTPUT_VARIABLE output
                     ERROR_VARIABLE error)
 
-    set(stderr_type "")
-
-    if (result)
-        set(stderr_type FATAL_ERROR)
-    endif ()
-
-    if (NOT error STREQUAL "" OR (result AND NOT output STREQUAL "No compilation units were found.\n"))
-        message(${stderr_type} "${error}")
-    endif ()
-
+    if (result AND NOT output MATCHES "^No compilation units were found\\.")
+        message(FATAL_ERROR "PVS-Studio exited with non-zero code.\nStdout:\n${output}\nStderr:\n${error}\n")
+    endif()
+    
     return()
 endif ()
 
